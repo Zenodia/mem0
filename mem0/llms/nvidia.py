@@ -20,7 +20,7 @@ class NVIDIALLM(LLMBase):
             temperature=0.1,
             top_p=0.7,
             max_tokens=1024,
-            nvapi_key=nvapi_key
+            nvapi_key=os.environ["NVIDIA_API_KEY"]
         )
 
     def _parse_response(self, response, tools):
