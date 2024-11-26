@@ -18,6 +18,7 @@ from mem0.memory.storage import SQLiteManager
 from mem0.memory.telemetry import capture_event
 from mem0.memory.utils import get_fact_retrieval_messages, parse_messages
 from mem0.utils.factory import EmbedderFactory, LlmFactory, VectorStoreFactory
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 
 # Setup user config
 setup_config()
@@ -57,7 +58,13 @@ class Memory(MemoryBase):
             logger.error(f"Configuration validation error: {e}")
             raise
         return cls(config)
-
+    def parse_json_for_nvidia(self, output):
+        if type(output)==AIMessage :
+            output=output.content
+        else:
+            output=output
+        jsonlike_output=output.replace("```","").replace('\n',"")
+        return jsonlike_output
     def add(
         self,
         messages,
@@ -179,17 +186,20 @@ class Memory(MemoryBase):
             retrieved_old_memory[idx]["id"] = str(idx)
 
         function_calling_prompt = get_update_memory_messages(retrieved_old_memory, new_retrieved_facts)
-
+        #print("********** function_calling_prompt \n", function_calling_prompt)
         new_memories_with_actions = self.llm.generate_response(
             messages=[{"role": "user", "content": function_calling_prompt}],
             response_format={"type": "json_object"},
         )
+        if self.config.llm.provider=="nvidia":
+            new_memories_with_actions=self.parse_json_for_nvidia(new_memories_with_actions)
         new_memories_with_actions = json.loads(new_memories_with_actions)
-
+        #print("################## \n", new_memories_with_actions)
         returned_memories = []
         try:
             for resp in new_memories_with_actions["memory"]:
                 logging.info(resp)
+                
                 try:
                     if resp["event"] == "ADD":
                         memory_id = self._create_memory(

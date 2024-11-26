@@ -6,7 +6,8 @@ from openai import OpenAI
 
 from mem0.configs.llms.base import BaseLlmConfig
 from mem0.llms.base import LLMBase
-
+from dotenv import load_dotenv
+load_dotenv()
 
 class OpenAILLM(LLMBase):
     def __init__(self, config: Optional[BaseLlmConfig] = None):

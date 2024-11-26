@@ -1,37 +1,26 @@
 import json
 import os
 from typing import Dict, List, Optional
-
-from openai import AzureOpenAI
-
+from langchain_nvidia_ai_endpoints import ChatNVIDIA, NVIDIAEmbeddings, NVIDIARerank
 from mem0.configs.llms.base import BaseLlmConfig
 from mem0.llms.base import LLMBase
 from dotenv import load_dotenv
 load_dotenv()
-import os
 
-class AzureOpenAILLM(LLMBase):
+class NVIDIALLM(LLMBase):
     def __init__(self, config: Optional[BaseLlmConfig] = None):
         super().__init__(config)
 
-        # Model name should match the custom deployment name chosen for it.
         if not self.config.model:
-            self.config.model = "gpt-4o"
+            self.config.model = "meta/llama-3.1-405b-instruct"
 
-        api_key = self.config.azure_kwargs.api_key or os.getenv("LLM_AZURE_OPENAI_API_KEY")
-        azure_deployment = self.config.azure_kwargs.azure_deployment or os.getenv("LLM_AZURE_DEPLOYMENT")
-        azure_endpoint = self.config.azure_kwargs.azure_endpoint or os.getenv("LLM_AZURE_ENDPOINT")
-        api_version = self.config.azure_kwargs.api_version or os.getenv("LLM_AZURE_API_VERSION")
-        default_headers = self.config.azure_kwargs.default_headers
-        print("########## Azure credentials ",api_key,'\n',azure_deployment,'\n',azure_endpoint,'\n', api_version,'\n', default_headers)
-
-        self.client = AzureOpenAI(
-            azure_deployment=azure_deployment,
-            azure_endpoint=azure_endpoint,
-            api_version=api_version,
-            api_key=api_key,
-            http_client=self.config.http_client,
-            default_headers=default_headers,
+    
+        self.client = ChatNVIDIA(
+            model=self.config.model,
+            temperature=0.1,
+            top_p=0.7,
+            max_tokens=1024,
+            nvapi_key=nvapi_key
         )
 
     def _parse_response(self, response, tools):
@@ -72,7 +61,7 @@ class AzureOpenAILLM(LLMBase):
         tool_choice: str = "auto",
     ):
         """
-        Generate a response based on the given messages using Azure OpenAI.
+        Generate a response based on the given messages using OpenAI.
 
         Args:
             messages (list): List of message dicts containing 'role' and 'content'.
@@ -83,18 +72,6 @@ class AzureOpenAILLM(LLMBase):
         Returns:
             str: The generated response.
         """
-        params = {
-            "model": self.config.model,
-            "messages": messages,
-            "temperature": self.config.temperature,
-            "max_tokens": self.config.max_tokens,
-            "top_p": self.config.top_p,
-        }
-        if response_format:
-            params["response_format"] = response_format
-        if tools:  # TODO: Remove tools if no issues found with new memory addition logic
-            params["tools"] = tools
-            params["tool_choice"] = tool_choice
-
-        response = self.client.chat.completions.create(**params)
-        return self._parse_response(response, tools)
+        response=self.client.invoke(messages).content
+        
+        return response

@@ -32,8 +32,8 @@ client = MemoryClient(api_key="your-api-key")
 ```
 
 ```javascript JavaScript
-import MemoryClient from 'mem0ai';
-const client = new MemoryClient({ apiKey: 'your-api-key' });
+const MemoryClient = require('mem0ai');
+const client = new MemoryClient('your-api-key');
 ```
 
 </CodeGroup>
@@ -108,29 +108,7 @@ curl -X POST "https://api.mem0.ai/v1/memories/" \
 ```
 
 ```json Output (v1.0)
-[
-  {
-    "id": "a1b2c3d4-e5f6-4g7h-8i9j-k0l1m2n3o4p5",
-    "data": {
-      "memory": "Name is Alex"
-    },
-    "event": "ADD"
-  },
-  {
-    "id": "b2c3d4e5-f6g7-8h9i-j0k1-l2m3n4o5p6q7",
-    "data": {
-      "memory": "Is a vegetarian"
-    },
-    "event": "ADD"
-  },
-  {
-    "id": "c3d4e5f6-g7h8-9i0j-k1l2-m3n4o5p6q7r8",
-    "data": {
-      "memory": "Is allergic to nuts"
-    },
-    "event": "ADD"
-  }
-]
+{'message': 'ok'}
 ```
 ```json Output (v1.1)
 {
@@ -208,22 +186,7 @@ curl -X POST "https://api.mem0.ai/v1/memories/" \
 ```
 
 ```json Output (v1.0)
-[
-  {
-    "id": "f2968654-5cd8-4d58-9f40-57ee339846b6",
-    "data": {
-      "memory": "Interested in vegetarian restaurants in Tokyo"
-    },
-    "event": "ADD"
-  },
-  {
-    "id": "f2968654-5cd8-4d58-9f40-57ee339846b6",
-    "data": {
-      "memory": "Planning a trip to Japan next month"
-    },
-    "event": "ADD"
-  }
-]
+{'message': 'ok'}
 ```
 
 ```json Output (v1.1)
@@ -286,29 +249,7 @@ curl -X POST "https://api.mem0.ai/v1/memories/" \
 ```
 
 ```json Output (v1.0)
-[
-    {
-        "id": "a1b2c3d4-e5f6-4g7h-8i9j-k0l1m2n3o4p5",
-        "data": {
-            "memory": "Name is Alex"
-        },
-        "event": "ADD"
-    },
-    {
-        "id": "b2c3d4e5-f6g7-8h9i-j0k1-l2m3n4o5p6q7",
-        "data": {
-            "memory": "Is a vegetarian"
-        },
-        "event": "ADD"
-    },
-    {
-        "id": "c3d4e5f6-g7h8-9i0j-k1l2-m3n4o5p6q7r8",
-        "data": {
-            "memory": "Is allergic to nuts"
-        },
-        "event": "ADD"
-    }
-]
+{'message': 'ok'}
 ```
 
 ```json Output (v1.1)
@@ -713,90 +654,78 @@ curl -X GET "https://api.mem0.ai/v1/entities/" \
 Fetch all memories for a user, agent, or run using the getAll() method.
 
 <Note> The `get_all` method supports two output formats: `v1.0` (default) and `v1.1`. To use the latest format, which provides more detailed information about each memory operation, set the `output_format` parameter to `v1.1`: </Note>
-<Note> We're soon deprecating the default output format for get_all() method, which returned a list. Once the changes are live, paginated response will be the only supported format, with 100 memories per page by default. You can customize this using the `page` and `page_size` parameters. </Note>
 
-The following examples showcase the paginated output format. 
 
 #### Get all memories of a user
 
 <CodeGroup>
 
 ```python Python
-memories = client.get_all(user_id="alex", page=1, page_size=50)
+# The default output_format is v1.0
+user_memories = client.get_all(user_id="alex", output_format="v1.0")
+
+# To use the latest output_format (v1.1), set the output_format parameter to "v1.1"
+user_memories = client.get_all(user_id="alex", output_format="v1.1")
 ```
 
 ```javascript JavaScript
-client.getAll({ user_id: "alex", page: 1, page_size: 50 })
+client.getAll({ user_id: "alex", output_format: "v1.1" })
     .then(memories => console.log(memories))
     .catch(error => console.error(error));
 ```
 
 ```bash cURL
-curl -X GET "https://api.mem0.ai/v1/memories/?user_id=alex&page=1&page_size=50" \
+curl -X GET "https://api.mem0.ai/v1/memories/?user_id=alex&output_format=v1.1" \
      -H "Authorization: Token your-api-key"
 ```
 
 ```json Output (v1.0)
-{
-    "count": 204,
-    "next": "https://api.mem0.ai/v1/memories/?user_id=alex&page=2&page_size=50",
-    "previous": null,
-    "results": [
-        {
-            "id":"f38b689d-6b24-45b7-bced-17fbb4d8bac7",
-            "memory":"是素食主义者，对坚果过敏。",
-            "agent_id":"travel-assistant",
-            "hash":"62bc074f56d1f909f1b4c2b639f56f6a",
-            "metadata":None,
-            "created_at":"2024-07-25T23:57:00.108347-07:00",
-            "updated_at":"2024-07-25T23:57:00.108367-07:00",
-            "categories":None
-        },
-        {
-            "id":"0a14d8f0-e364-4f5c-b305-10da1f0d0878",
-            "memory":"Will maintain personalized travel preferences for each user. Provide customized recommendations based on dietary restrictions, interests, and past interactions.",
-            "agent_id":"travel-assistant",
-            "hash":"35a305373d639b0bffc6c2a3e2eb4244",
-            "metadata":"None",
-            "created_at":"2024-07-26T00:31:03.543759-07:00",
-            "updated_at":"2024-07-26T00:31:03.543778-07:00",
-            "categories":None
-        }
-        ... (remaining 48 memories)
-    ]
-}
+[
+   {
+      "id":"f38b689d-6b24-45b7-bced-17fbb4d8bac7",
+      "memory":"是素食主义者，对坚果过敏。",
+      "agent_id":"travel-assistant",
+      "hash":"62bc074f56d1f909f1b4c2b639f56f6a",
+      "metadata":None,
+      "created_at":"2024-07-25T23:57:00.108347-07:00",
+      "updated_at":"2024-07-25T23:57:00.108367-07:00",
+      "categories":None
+   },
+   {
+      "id":"0a14d8f0-e364-4f5c-b305-10da1f0d0878",
+      "memory":"Will maintain personalized travel preferences for each user. Provide customized recommendations based on dietary restrictions, interests, and past interactions.",
+      "agent_id":"travel-assistant",
+      "hash":"35a305373d639b0bffc6c2a3e2eb4244",
+      "metadata":"None",
+      "created_at":"2024-07-26T00:31:03.543759-07:00",
+      "updated_at":"2024-07-26T00:31:03.543778-07:00",
+      "categories":None
+   }
+]
 ```
 
 ```json Output (v1.1)
 {
-    "count": 204,
-    "next": "https://api.mem0.ai/v1/memories/?user_id=alex&output_format=v1.1&page=2&page_size=50",
-    "previous": null,
-    "results": {
-        "results": [
-            {
-                "id":"f38b689d-6b24-45b7-bced-17fbb4d8bac7",
-                "memory":"是素食主义者，对坚果过敏。",
-                "agent_id":"travel-assistant",
-                "hash":"62bc074f56d1f909f1b4c2b639f56f6a",
-                "metadata":None,
-                "created_at":"2024-07-25T23:57:00.108347-07:00",
-                "updated_at":"2024-07-25T23:57:00.108367-07:00",
-                "categories":None
-            },
-            {
-                "id":"0a14d8f0-e364-4f5c-b305-10da1f0d0878",
-                "memory":"Will maintain personalized travel preferences for each user. Provide customized recommendations based on dietary restrictions, interests, and past interactions.",
-                "agent_id":"travel-assistant",
-                "hash":"35a305373d639b0bffc6c2a3e2eb4244",
-                "metadata":"None",
-                "created_at":"2024-07-26T00:31:03.543759-07:00",
-                "updated_at":"2024-07-26T00:31:03.543778-07:00",
-                "categories":None
-            }
-            ... (remaining 48 memories)
-        ]
-    }
+    "results": [
+        {
+            "id": "f38b689d-6b24-45b7-bced-17fbb4d8bac7",
+            "memory": "是素食主义者，对坚果过敏。",
+            "agent_id": "travel-assistant",
+            "hash": "62bc074f56d1f909f1b4c2b639f56f6a",
+            "metadata":None,
+            "created_at": "2024-07-25T23:57:00.108347-07:00",
+            "updated_at": "2024-07-25T23:57:00.108367-07:00"
+        },
+        {
+            "id": "0a14d8f0-e364-4f5c-b305-10da1f0d0878",
+            "memory": "Will maintain personalized travel preferences for each user. Provide customized recommendations based on dietary restrictions, interests, and past interactions.",
+            "agent_id": "travel-assistant",
+            "hash": "35a305373d639b0bffc6c2a3e2eb4244",
+            "metadata":None,
+            "created_at": "2024-07-26T00:31:03.543759-07:00",
+            "updated_at": "2024-07-26T00:31:03.543778-07:00"
+        }
+    ]
 }
 ```
 
@@ -807,79 +736,71 @@ curl -X GET "https://api.mem0.ai/v1/memories/?user_id=alex&page=1&page_size=50" 
 
 <CodeGroup>
 ```python Python
-agent_memories = client.get_all(agent_id="ai-tutor", page=1, page_size=50)
+# The default output_format is v1.0
+client.get_all(agent_id="ai-tutor", output_format="v1.0")
+
+# To use the latest output_format (v1.1), set the output_format parameter to "v1.1"
+client.get_all(agent_id="ai-tutor", output_format="v1.1")
 ```
 
 ```javascript JavaScript
-client.getAll({ agent_id: "ai-tutor", page: 1, page_size: 50 })
+client.getAll({ agent_id: "ai-tutor", output_format: "v1.1" })
     .then(memories => console.log(memories))
     .catch(error => console.error(error));
 ```
 
 ```bash cURL
-curl -X GET "https://api.mem0.ai/v1/memories/?agent_id=ai-tutor&page=1&page_size=50" \
+curl -X GET "https://api.mem0.ai/v1/memories/?agent_id=travel-assistant&output_format=v1.1" \
      -H "Authorization: Token your-api-key"
 ```
 
 ```json Output (v1.0)
-{
-    "count": 78,
-    "next": "https://api.mem0.ai/v1/memories/?agent_id=ai-tutor&page=2&page_size=50",
-    "previous": null,
-    "results": [
-        {
-            "id":"f38b689d-6b24-45b7-bced-17fbb4d8bac7",
-            "memory":"是素食主义者，对坚果过敏。",
-            "agent_id":"ai-tutor",
-            "hash":"62bc074f56d1f909f1b4c2b639f56f6a",
-            "metadata":None,
-            "created_at":"2024-07-25T23:57:00.108347-07:00",
-            "updated_at":"2024-07-25T23:57:00.108367-07:00",
-            "categories":None
-        },
-        {
-            "id":"0a14d8f0-e364-4f5c-b305-10da1f0d0878",
-            "memory":"My name is Alice.",
-            "agent_id":"ai-tutor",
-            "hash":"35a305373d639b0bffc6c2a3e2eb4244",
-            "metadata":None,
-            "created_at":"2024-07-26T00:31:03.543759-07:00",
-            "updated_at":"2024-07-26T00:31:03.543778-07:00",
-            "categories":None
-        }
-        ... (remaining 48 memories)
-    ]
-}
+[
+   {
+      "id":"f38b689d-6b24-45b7-bced-17fbb4d8bac7",
+      "memory":"是素食主义者，对坚果过敏。",
+      "agent_id":"ai-tutor",
+      "hash":"62bc074f56d1f909f1b4c2b639f56f6a",
+      "metadata":None,
+      "created_at":"2024-07-25T23:57:00.108347-07:00",
+      "updated_at":"2024-07-25T23:57:00.108367-07:00",
+      "categories":None
+   },
+   {
+      "id":"0a14d8f0-e364-4f5c-b305-10da1f0d0878",
+      "memory":"My name is Alice.",
+      "agent_id":"ai-tutor",
+      "hash":"35a305373d639b0bffc6c2a3e2eb4244",
+      "metadata":None,
+      "created_at":"2024-07-26T00:31:03.543759-07:00",
+      "updated_at":"2024-07-26T00:31:03.543778-07:00",
+      "categories":None
+   }
+]
 ```
 
 ```json Output (v1.1)
 {
-    "count": 78,
-    "next": "https://api.mem0.ai/v1/memories/?agent_id=ai-tutor&output_format=v1.1&page=2&page_size=50",
-    "previous": null,
-    "results": {
-        "results": [
-            {
-                "id": "f38b689d-6b24-45b7-bced-17fbb4d8bac7",
-                "memory": "是素食主义者，对坚果过敏。",
-                "agent_id": "ai-tutor",
-                "hash": "62bc074f56d1f909f1b4c2b639f56f6a",
-                "metadata":None,
-                "created_at": "2024-07-25T23:57:00.108347-07:00",
-                "updated_at": "2024-07-25T23:57:00.108367-07:00"
-            },
-            {
-                "id": "0a14d8f0-e364-4f5c-b305-10da1f0d0878",
-                "memory": "My name is Alice.",
-                "agent_id": "ai-tutor",
-                "hash": "35a305373d639b0bffc6c2a3e2eb4244",
-                "metadata":None,
-                "created_at": "2024-07-26T00:31:03.543759-07:00",
-                "updated_at": "2024-07-26T00:31:03.543778-07:00"
-            }
-            ... (remaining 48 memories)
-        ]
+  "results": [
+    {
+      "id": "f38b689d-6b24-45b7-bced-17fbb4d8bac7",
+      "memory": "是素食主义者，对坚果过敏。",
+      "agent_id": "ai-tutor",
+      "hash": "62bc074f56d1f909f1b4c2b639f56f6a",
+      "metadata":None,
+      "created_at": "2024-07-25T23:57:00.108347-07:00",
+      "updated_at": "2024-07-25T23:57:00.108367-07:00"
+    },
+    {
+      "id": "0a14d8f0-e364-4f5c-b305-10da1f0d0878",
+      "memory": "My name is Alice.",
+      "agent_id": "ai-tutor",
+      "hash": "35a305373d639b0bffc6c2a3e2eb4244",
+      "metadata":None,
+      "created_at": "2024-07-26T00:31:03.543759-07:00",
+      "updated_at": "2024-07-26T00:31:03.543778-07:00"
     }
+  ]
 }
 ```
 </CodeGroup>
@@ -889,101 +810,93 @@ curl -X GET "https://api.mem0.ai/v1/memories/?agent_id=ai-tutor&page=1&page_size
 <CodeGroup>
 
 ```python Python
-short_term_memories = client.get_all(user_id="alex123", run_id="trip-planning-2024", page=1, page_size=50)
+# The default output_format is v1.0
+short_term_memories = client.get_all(user_id="alex123", run_id="trip-planning-2024", output_format="v1.0")
+
+# To use the latest output_format (v1.1), set the output_format parameter to "v1.1"
+short_term_memories = client.get_all(user_id="alex123", run_id="trip-planning-2024", output_format="v1.1")
 ```
 
 ```javascript JavaScript
-client.getAll({ user_id: "alex123", run_id: "trip-planning-2024", page: 1, page_size: 50 })
+client.getAll({ user_id: "alex123", run_id: "trip-planning-2024", output_format: "v1.1" })
     .then(memories => console.log(memories))
     .catch(error => console.error(error));
 ```
 
 ```bash cURL
-curl -X GET "https://api.mem0.ai/v1/memories/?user_id=alex123&run_id=trip-planning-2024&page=1&page_size=50" \
+curl -X GET "https://api.mem0.ai/v1/memories/?user_id=alex123&run_id=trip-planning-2024&output_format=v1.1" \
      -H "Authorization: Token your-api-key"
 ```
 
 ```json Output (v1.0)
-{
-    "count": 18,
-    "next": null,
-    "previous": null,
-    "results": [
-        {
-            "id":"06d8df63-7bd2-4fad-9acb-60871bcecee0",
-            "memory":"Planning a trip to Japan next month. Interested in vegetarian restaurants in Tokyo.",
-            "user_id":"alex123",
-            "hash":"d2088c936e259f2f5d2d75543d31401c",
-            "metadata":None,
-            "created_at":"2024-07-26T00:25:16.566471-07:00",
-            "updated_at":"2024-07-26T00:25:16.566492-07:00",
-            "categories":None
-        },
-        {
-            "id":"b4229775-d860-4ccb-983f-0f628ca112f5",
-            "memory":"Planning a trip to Japan next month. Interested in vegetarian restaurants in Tokyo.",
-            "user_id":"alex123",
-            "hash":"d2088c936e259f2f5d2d75543d31401c",
-            "metadata":None,
-            "created_at":"2024-07-26T00:33:20.350542-07:00",
-            "updated_at":"2024-07-26T00:33:20.350560-07:00",
-            "categories":None
-        },
-        {
-            "id":"df1aca24-76cf-4b92-9f58-d03857efcb64",
-            "memory":"Planning a trip to Japan next month. Interested in vegetarian restaurants in Tokyo.",
-            "user_id":"alex123",
-            "hash":"d2088c936e259f2f5d2d75543d31401c",
-            "metadata":None,
-            "created_at":"2024-07-26T00:51:09.642275-07:00",
-            "updated_at":"2024-07-26T00:51:09.642295-07:00",
-            "categories":None
-        }
-        ... (remaining 15 memories)
-    ]
-}
+[
+   {
+      "id":"06d8df63-7bd2-4fad-9acb-60871bcecee0",
+      "memory":"Planning a trip to Japan next month. Interested in vegetarian restaurants in Tokyo.",
+      "user_id":"alex123",
+      "hash":"d2088c936e259f2f5d2d75543d31401c",
+      "metadata":None,
+      "created_at":"2024-07-26T00:25:16.566471-07:00",
+      "updated_at":"2024-07-26T00:25:16.566492-07:00",
+      "categories":None
+   },
+   {
+      "id":"b4229775-d860-4ccb-983f-0f628ca112f5",
+      "memory":"Planning a trip to Japan next month. Interested in vegetarian restaurants in Tokyo.",
+      "user_id":"alex123",
+      "hash":"d2088c936e259f2f5d2d75543d31401c",
+      "metadata":None,
+      "created_at":"2024-07-26T00:33:20.350542-07:00",
+      "updated_at":"2024-07-26T00:33:20.350560-07:00",
+      "categories":None
+   },
+   {
+      "id":"df1aca24-76cf-4b92-9f58-d03857efcb64",
+      "memory":"Planning a trip to Japan next month. Interested in vegetarian restaurants in Tokyo.",
+      "user_id":"alex123",
+      "hash":"d2088c936e259f2f5d2d75543d31401c",
+      "metadata":None,
+      "created_at":"2024-07-26T00:51:09.642275-07:00",
+      "updated_at":"2024-07-26T00:51:09.642295-07:00",
+      "categories":None
+   }
+]
 ```
 
 ```json Output (v1.1)
 {
-    "count": 18,
-    "next": null,
-    "previous": null,
-    "results": {
-       "results": [
-            {
-                "id": "06d8df63-7bd2-4fad-9acb-60871bcecee0",
-                "memory": "Planning a trip to Japan next month. Interested in vegetarian restaurants in Tokyo.",
-                "user_id": "alex123",
-                "hash": "d2088c936e259f2f5d2d75543d31401c",
-                "metadata":None,
-                "created_at": "2024-07-26T00:25:16.566471-07:00",
-                "updated_at": "2024-07-26T00:25:16.566492-07:00",
-                "categories": ["food_preferences"]
-            },
-            {
-                "id": "b4229775-d860-4ccb-983f-0f628ca112f5",
-                "memory": "Planning a trip to Japan next month. Interested in vegetarian restaurants in Tokyo.",
-                "user_id": "alex123",
-                "hash": "d2088c936e259f2f5d2d75543d31401c",
-                "metadata":None,
-                "created_at": "2024-07-26T00:33:20.350542-07:00",
-                "updated_at": "2024-07-26T00:33:20.350560-07:00",
-                "categories": ["food_preferences"]
-            },
-            {
-                "id": "df1aca24-76cf-4b92-9f58-d03857efcb64",
-                "memory": "Planning a trip to Japan next month. Interested in vegetarian restaurants in Tokyo.",
-                "user_id": "alex123",
-                "hash": "d2088c936e259f2f5d2d75543d31401c",
-                "metadata":None,
-                "created_at": "2024-07-26T00:51:09.642275-07:00",
-                "updated_at": "2024-07-26T00:51:09.642295-07:00",
-                "categories": None
-            }
-            ... (remaining 15 memories)
-        ]
-    }
+   "results": [
+      {
+         "id": "06d8df63-7bd2-4fad-9acb-60871bcecee0",
+         "memory": "Planning a trip to Japan next month. Interested in vegetarian restaurants in Tokyo.",
+         "user_id": "alex123",
+         "hash": "d2088c936e259f2f5d2d75543d31401c",
+         "metadata":None,
+         "created_at": "2024-07-26T00:25:16.566471-07:00",
+         "updated_at": "2024-07-26T00:25:16.566492-07:00",
+         "categories": ["food_preferences"]
+      },
+      {
+         "id": "b4229775-d860-4ccb-983f-0f628ca112f5",
+         "memory": "Planning a trip to Japan next month. Interested in vegetarian restaurants in Tokyo.",
+         "user_id": "alex123",
+         "hash": "d2088c936e259f2f5d2d75543d31401c",
+         "metadata":None,
+         "created_at": "2024-07-26T00:33:20.350542-07:00",
+         "updated_at": "2024-07-26T00:33:20.350560-07:00",
+         "categories": ["food_preferences"]
+      },
+      {
+         "id": "df1aca24-76cf-4b92-9f58-d03857efcb64",
+         "memory": "Planning a trip to Japan next month. Interested in vegetarian restaurants in Tokyo.",
+         "user_id": "alex123",
+         "hash": "d2088c936e259f2f5d2d75543d31401c",
+         "metadata":None,
+         "created_at": "2024-07-26T00:51:09.642275-07:00",
+         "updated_at": "2024-07-26T00:51:09.642295-07:00",
+         "categories": None
+      }
+   ]
 }
 ```
 </CodeGroup>
@@ -1046,12 +959,7 @@ filters = {
       }
    ]
 }
-
-# Default (No Pagination)
 client.get_all(version="v2", filters=filters)
-
-# Pagination (You can also use the page and page_size parameters)
-client.get_all(version="v2", filters=filters, page=1, page_size=50)
 ```
 
 ```javascript JavaScript
@@ -1068,20 +976,12 @@ const filters = {
       }
    ]
 };
-
-// Default (No Pagination)
 client.getAll({ version: "v2", filters })
-    .then(memories => console.log(memories))
-    .catch(error => console.error(error));
-
-// Pagination (You can also use the page and page_size parameters)
-client.getAll({ version: "v2", filters, page: 1, page_size: 50 })
     .then(memories => console.log(memories))
     .catch(error => console.error(error));
 ```
 
 ```bash cURL
-# Default (No Pagination)
 curl -X GET "https://api.mem0.ai/v1/memories/?version=v2" \
      -H "Authorization: Token your-api-key" \
      -H "Content-Type: application/json" \
@@ -1100,29 +1000,9 @@ curl -X GET "https://api.mem0.ai/v1/memories/?version=v2" \
              ]
          }
      }'
-
-# Pagination (You can also use the page and page_size parameters)
-curl -X GET "https://api.mem0.ai/v1/memories/?version=v2&page=1&page_size=50" \
-     -H "Authorization: Token your-api-key" \
-     -H "Content-Type: application/json" \
-     -d '{
-         "filters": {
-             "AND": [
-                 {
-                     "user_id": "alex"
-                 },
-                 {
-                     "created_at": {
-                         "gte": "2024-07-01",
-                         "lte": "2024-07-31"
-                     }
-                 }
-             ]
-         }
-     }'
 ```
 
-```json Output (Default)
+```json Output
 [
    {
       "id":"f38b689d-6b24-45b7-bced-17fbb4d8bac7",
@@ -1136,27 +1016,6 @@ curl -X GET "https://api.mem0.ai/v1/memories/?version=v2&page=1&page_size=50" \
    }
 ]
 ```
-
-```json Output (Paginated)
-{
-    "count": 1,
-    "next": null,
-    "previous": null,
-    "results": [
-        {
-            "id":"f38b689d-6b24-45b7-bced-17fbb4d8bac7",
-            "memory":"Name: Alex. Vegetarian. Allergic to nuts.",
-            "user_id":"alex",
-            "hash":"62bc074f56d1f909f1b4c2b639f56f6a",
-            "metadata":null,
-            "created_at":"2024-07-25T23:57:00.108347-07:00",
-            "updated_at":"2024-07-25T23:57:00.108367-07:00",
-            "categories": ["food_preferences"]
-        }
-    ]
-}
-```
-
 </CodeGroup>
 
 ### 4.5 Memory History
@@ -1410,7 +1269,6 @@ curl -X POST "https://api.mem0.ai/v1/memories/" \
 ```json Output
 {'message': 'ok'}
 ```
-
 </CodeGroup>
 
 If you have any questions, please feel free to reach out to us using one of the following methods:
