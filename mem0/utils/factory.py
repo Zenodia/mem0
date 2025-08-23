@@ -11,7 +11,8 @@ from mem0.configs.llms.ollama import OllamaConfig
 from mem0.configs.llms.openai import OpenAIConfig
 from mem0.configs.llms.vllm import VllmConfig
 from mem0.embeddings.mock import MockEmbeddings
-
+from mem0.configs.llms.nvidia import NVIDIAConfig
+from mem0.embeddings.nvidia import NVEmbedding
 
 def load_class(class_type):
     module_path, class_name = class_type.rsplit(".", 1)
@@ -44,6 +45,7 @@ class LlmFactory:
         "lmstudio": ("mem0.llms.lmstudio.LMStudioLLM", LMStudioConfig),
         "vllm": ("mem0.llms.vllm.VllmLLM", VllmConfig),
         "langchain": ("mem0.llms.langchain.LangchainLLM", BaseLlmConfig),
+        "nvidia": ("mem0.llms.nvidia.NVIDIALLM", BaseLlmConfig),
     }
 
     @classmethod
@@ -139,6 +141,7 @@ class EmbedderFactory:
         "lmstudio": "mem0.embeddings.lmstudio.LMStudioEmbedding",
         "langchain": "mem0.embeddings.langchain.LangchainEmbedding",
         "aws_bedrock": "mem0.embeddings.aws_bedrock.AWSBedrockEmbedding",
+        "nvidia": "mem0.embeddings.nvidia.NVEmbedding",
     }
 
     @classmethod
@@ -173,6 +176,7 @@ class VectorStoreFactory:
         "weaviate": "mem0.vector_stores.weaviate.Weaviate",
         "faiss": "mem0.vector_stores.faiss.FAISS",
         "langchain": "mem0.vector_stores.langchain.Langchain",
+        "nvidia": "mem0.embeddings.nvidia.NVEmbedding",
     }
 
     @classmethod
